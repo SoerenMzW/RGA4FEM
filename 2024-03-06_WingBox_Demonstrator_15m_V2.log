@@ -1,0 +1,22 @@
+Analysis initiated from SIMULIA established products
+Abaqus JOB 2024-03-06_WingBox_Demonstrator_15m_V2
+Abaqus 2023
+Abaqus License Manager checked out the following licenses:
+Abaqus/Standard checked out 5 tokens from Flexnet server abaqus-lic.rrzn.uni-hannover.de.
+<485 out of 756 licenses remain available>.
+Begin Analysis Input File Processor
+06.03.2024 09:42:50
+Run pre.exe
+06.03.2024 09:42:55
+End Analysis Input File Processor
+Begin Abaqus/Standard Analysis
+06.03.2024 09:42:55
+Run standard.exe
+06.03.2024 09:43:00
+End Abaqus/Standard Analysis
+Begin SIM Wrap-up
+06.03.2024 09:43:01
+Run SMASimUtility.exe
+06.03.2024 09:43:01
+End SIM Wrap-up
+Abaqus JOB 2024-03-06_WingBox_Demonstrator_15m_V2 COMPLETED

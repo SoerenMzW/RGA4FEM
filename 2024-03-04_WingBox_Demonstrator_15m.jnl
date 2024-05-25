@@ -1,0 +1,254 @@
+# -*- coding: mbcs -*-
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+from connectorBehavior import *
+mdb.openStep(
+    'C:/Users/Meyer-zu-Westerhause/Desktop/Sim_15m_Demonstrator/V2/WingBox_Demonstrator_15m_V2.stp'
+    , scaleFromFile=OFF)
+mdb.models['Model-1'].PartFromGeometryFile(combine=True, dimensionality=THREE_D
+    , geometryFile=mdb.acis, name='WingBox', type=DEFORMABLE_BODY)
+mdb.models['Model-1'].Material(name='Aluminium')
+mdb.models['Model-1'].materials['Aluminium'].Density(table=((0.0027, ), ))
+mdb.models['Model-1'].materials['Aluminium'].Elastic(table=((70000.0, 0.34), ))
+mdb.models['Model-1'].HomogeneousShellSection(idealization=NO_IDEALIZATION, 
+    integrationRule=GAUSS, material='Aluminium', name='Section-WingBox', 
+    nodalThicknessField='', numIntPts=3, poissonDefinition=DEFAULT, 
+    preIntegrate=OFF, temperature=GRADIENT, thickness=3.5, thicknessField='', 
+    thicknessModulus=None, thicknessType=UNIFORM, useDensity=OFF)
+mdb.models['Model-1'].parts['WingBox'].Set(faces=
+    mdb.models['Model-1'].parts['WingBox'].faces.getSequenceFromMask((
+    '[#ffffff ]', ), ), name='Set-Section_WingBox')
+mdb.models['Model-1'].parts['WingBox'].SectionAssignment(offset=0.0, 
+    offsetField='', offsetType=MIDDLE_SURFACE, region=
+    mdb.models['Model-1'].parts['WingBox'].sets['Set-Section_WingBox'], 
+    sectionName='Section-WingBox', thicknessAssignment=FROM_SECTION)
+mdb.models['Model-1'].rootAssembly.DatumCsysByDefault(CARTESIAN)
+mdb.models['Model-1'].rootAssembly.Instance(dependent=ON, name='WingBox-1', 
+    part=mdb.models['Model-1'].parts['WingBox'])
+mdb.models['Model-1'].StaticStep(name='Load-Step', previous='Initial')
+mdb.models['Model-1'].rootAssembly.ReferencePoint(point=(-300.0, 1250.0, 
+    300.0))
+mdb.models['Model-1'].rootAssembly.ReferencePoint(point=(15000.0, -500.0, 
+    500.0))
+mdb.models['Model-1'].rootAssembly.features.changeKey(fromName='RP-1', toName=
+    'RP-Clamp')
+mdb.models['Model-1'].rootAssembly.features.changeKey(fromName='RP-2', toName=
+    'RP-Load')
+mdb.models['Model-1'].rootAssembly.features['RP-Load'].setValues(yValue=-600.0)
+mdb.models['Model-1'].rootAssembly.regenerate()
+mdb.models['Model-1'].rootAssembly.features['RP-Load'].setValues(yValue=-800.0)
+mdb.models['Model-1'].rootAssembly.regenerate()
+mdb.models['Model-1'].rootAssembly.features['RP-Load'].setValues(yValue=-700.0)
+mdb.models['Model-1'].rootAssembly.regenerate()
+mdb.models['Model-1'].rootAssembly.Set(edges=
+    mdb.models['Model-1'].rootAssembly.instances['WingBox-1'].edges.getSequenceFromMask(
+    ('[#20 ]', ), ), name='p_Set-Load')
+mdb.models['Model-1'].RigidBody(name='RigidBody-Load', pinRegion=
+    mdb.models['Model-1'].rootAssembly.sets['p_Set-Load'], refPointRegion=
+    Region(referencePoints=(
+    mdb.models['Model-1'].rootAssembly.referencePoints[5], )))
+mdb.models['Model-1'].rootAssembly.Set(edges=
+    mdb.models['Model-1'].rootAssembly.instances['WingBox-1'].edges.getSequenceFromMask(
+    ('[#0 #b04 ]', ), ), name='p_Set-Clamp')
+mdb.models['Model-1'].RigidBody(name='RigidBody-Clamp', pinRegion=
+    mdb.models['Model-1'].rootAssembly.sets['p_Set-Clamp'], refPointRegion=
+    Region(referencePoints=(
+    mdb.models['Model-1'].rootAssembly.referencePoints[4], )))
+mdb.models['Model-1'].rootAssembly.Set(name='Clamp-Set', referencePoints=(
+    mdb.models['Model-1'].rootAssembly.referencePoints[4], ))
+mdb.models['Model-1'].DisplacementBC(amplitude=UNSET, createStepName=
+    'Load-Step', distributionType=UNIFORM, fieldName='', fixed=OFF, localCsys=
+    None, name='BC-Clamped-End', region=
+    mdb.models['Model-1'].rootAssembly.sets['Clamp-Set'], u1=0.0, u2=0.0, u3=
+    0.0, ur1=0.0, ur2=0.0, ur3=0.0)
+mdb.models['Model-1'].rootAssembly.Set(name='Load-Point-Set', referencePoints=(
+    mdb.models['Model-1'].rootAssembly.referencePoints[5], ))
+mdb.models['Model-1'].DisplacementBC(amplitude=UNSET, createStepName=
+    'Load-Step', distributionType=UNIFORM, fieldName='', fixed=OFF, localCsys=
+    None, name='Load-Displacement', region=
+    mdb.models['Model-1'].rootAssembly.sets['Load-Point-Set'], u1=UNSET, u2=
+    UNSET, u3=400.0, ur1=UNSET, ur2=UNSET, ur3=UNSET)
+mdb.models['Model-1'].parts['WingBox'].seedPart(deviationFactor=0.1, 
+    minSizeFactor=0.1, size=200.0)
+mdb.models['Model-1'].parts['WingBox'].seedPart(deviationFactor=0.1, 
+    minSizeFactor=0.1, size=100.0)
+mdb.models['Model-1'].parts['WingBox'].generateMesh()
+mdb.models['Model-1'].rootAssembly.regenerate()
+mdb.Job(atTime=None, contactPrint=OFF, description='', echoPrint=OFF, 
+    explicitPrecision=SINGLE, getMemoryFromAnalysis=True, historyPrint=OFF, 
+    memory=90, memoryUnits=PERCENTAGE, model='Model-1', modelPrint=OFF, 
+    multiprocessingMode=DEFAULT, name='2024-03-04_WingBox-Demonstrator_15m', 
+    nodalOutputPrecision=SINGLE, numCpus=1, numGPUs=0, numThreadsPerMpiProcess=
+    1, queue=None, resultsFormat=ODB, scratch='', type=ANALYSIS, 
+    userSubroutine='', waitHours=0, waitMinutes=0)
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m'].submit(consistencyChecking=OFF)
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(STARTED, {
+    'phase': BATCHPRE_PHASE, 'clientHost': 'IPEG-PC-065', 'handle': 0, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(ODB_FILE, {
+    'phase': BATCHPRE_PHASE, 
+    'file': 'C:\\Users\\Meyer-zu-Westerhause\\Desktop\\Sim_15m_Demonstrator\\V2\\2024-03-04_WingBox-Demonstrator_15m.odb', 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(COMPLETED, {
+    'phase': BATCHPRE_PHASE, 'message': 'Analysis phase complete', 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(STARTED, {
+    'phase': STANDARD_PHASE, 'clientHost': 'IPEG-PC-065', 'handle': 12600, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(STEP, {
+    'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(ODB_FRAME, {
+    'phase': STANDARD_PHASE, 'step': 0, 'frame': 0, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(MEMORY_ESTIMATE, {
+    'phase': STANDARD_PHASE, 'jobName': '2024-03-04_WingBox-Demonstrator_15m', 
+    'memory': 125.0})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(PHYSICAL_MEMORY, {
+    'phase': STANDARD_PHASE, 'physical_memory': 16107.0, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(MINIMUM_MEMORY, {
+    'minimum_memory': 26.0, 'phase': STANDARD_PHASE, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(WARNING, {
+    'phase': STANDARD_PHASE, 
+    'message': 'Solver problem. Numerical singularity when processing node ASSEMBLY.2 D.O.F. 5 ratio = 1.01708E+15.', 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(ODB_FRAME, {
+    'phase': STANDARD_PHASE, 'step': 0, 'frame': 1, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(STATUS, {
+    'totalTime': 1.0, 'attempts': 1, 'timeIncrement': 1.0, 'increment': 1, 
+    'stepTime': 1.0, 'step': 1, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m', 'severe': 0, 
+    'iterations': 1, 'phase': STANDARD_PHASE, 'equilibrium': 1})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(END_STEP, {
+    'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(COMPLETED, {
+    'phase': STANDARD_PHASE, 'message': 'Analysis phase complete', 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(JOB_COMPLETED, {
+    'time': 'Mon Mar  4 12:45:49 2024', 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.models['Model-1'].boundaryConditions['Load-Displacement'].setValues(u3=
+    800.0)
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m'].submit(consistencyChecking=OFF)
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(STARTED, {
+    'phase': BATCHPRE_PHASE, 'clientHost': 'IPEG-PC-065', 'handle': 0, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(ODB_FILE, {
+    'phase': BATCHPRE_PHASE, 
+    'file': 'C:\\Users\\Meyer-zu-Westerhause\\Desktop\\Sim_15m_Demonstrator\\V2\\2024-03-04_WingBox-Demonstrator_15m.odb', 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(COMPLETED, {
+    'phase': BATCHPRE_PHASE, 'message': 'Analysis phase complete', 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(STARTED, {
+    'phase': STANDARD_PHASE, 'clientHost': 'IPEG-PC-065', 'handle': 2432, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(STEP, {
+    'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(ODB_FRAME, {
+    'phase': STANDARD_PHASE, 'step': 0, 'frame': 0, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(MEMORY_ESTIMATE, {
+    'phase': STANDARD_PHASE, 'jobName': '2024-03-04_WingBox-Demonstrator_15m', 
+    'memory': 125.0})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(PHYSICAL_MEMORY, {
+    'phase': STANDARD_PHASE, 'physical_memory': 16107.0, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(MINIMUM_MEMORY, {
+    'minimum_memory': 26.0, 'phase': STANDARD_PHASE, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(WARNING, {
+    'phase': STANDARD_PHASE, 
+    'message': 'Solver problem. Numerical singularity when processing node ASSEMBLY.2 D.O.F. 5 ratio = 1.01708E+15.', 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(ODB_FRAME, {
+    'phase': STANDARD_PHASE, 'step': 0, 'frame': 1, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(STATUS, {
+    'totalTime': 1.0, 'attempts': 1, 'timeIncrement': 1.0, 'increment': 1, 
+    'stepTime': 1.0, 'step': 1, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m', 'severe': 0, 
+    'iterations': 1, 'phase': STANDARD_PHASE, 'equilibrium': 1})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(END_STEP, {
+    'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(COMPLETED, {
+    'phase': STANDARD_PHASE, 'message': 'Analysis phase complete', 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(JOB_COMPLETED, {
+    'time': 'Mon Mar  4 12:47:20 2024', 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.models['Model-1'].rootAssembly.features['RP-Load'].setValues(zValue=2500.0)
+mdb.models['Model-1'].rootAssembly.regenerate()
+mdb.models['Model-1'].boundaryConditions['Load-Displacement'].setValues(u3=
+    1000.0)
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m'].submit(consistencyChecking=OFF)
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(STARTED, {
+    'phase': BATCHPRE_PHASE, 'clientHost': 'IPEG-PC-065', 'handle': 0, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(ODB_FILE, {
+    'phase': BATCHPRE_PHASE, 
+    'file': 'C:\\Users\\Meyer-zu-Westerhause\\Desktop\\Sim_15m_Demonstrator\\V2\\2024-03-04_WingBox-Demonstrator_15m.odb', 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(COMPLETED, {
+    'phase': BATCHPRE_PHASE, 'message': 'Analysis phase complete', 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(STARTED, {
+    'phase': STANDARD_PHASE, 'clientHost': 'IPEG-PC-065', 'handle': 17732, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(STEP, {
+    'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(ODB_FRAME, {
+    'phase': STANDARD_PHASE, 'step': 0, 'frame': 0, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(MEMORY_ESTIMATE, {
+    'phase': STANDARD_PHASE, 'jobName': '2024-03-04_WingBox-Demonstrator_15m', 
+    'memory': 125.0})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(PHYSICAL_MEMORY, {
+    'phase': STANDARD_PHASE, 'physical_memory': 16107.0, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(MINIMUM_MEMORY, {
+    'minimum_memory': 26.0, 'phase': STANDARD_PHASE, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(WARNING, {
+    'phase': STANDARD_PHASE, 
+    'message': 'Solver problem. Numerical singularity when processing node ASSEMBLY.2 D.O.F. 5 ratio = 1.76521E+15.', 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(WARNING, {
+    'phase': STANDARD_PHASE, 
+    'message': 'Solver problem. Numerical singularity when processing node ASSEMBLY.2 D.O.F. 5 ratio = 1.76521E+15.', 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(ODB_FRAME, {
+    'phase': STANDARD_PHASE, 'step': 0, 'frame': 1, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(STATUS, {
+    'totalTime': 1.0, 'attempts': 1, 'timeIncrement': 1.0, 'increment': 1, 
+    'stepTime': 1.0, 'step': 1, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m', 'severe': 0, 
+    'iterations': 2, 'phase': STANDARD_PHASE, 'equilibrium': 2})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(END_STEP, {
+    'phase': STANDARD_PHASE, 'stepId': 1, 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(COMPLETED, {
+    'phase': STANDARD_PHASE, 'message': 'Analysis phase complete', 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+mdb.jobs['2024-03-04_WingBox-Demonstrator_15m']._Message(JOB_COMPLETED, {
+    'time': 'Mon Mar  4 12:49:20 2024', 
+    'jobName': '2024-03-04_WingBox-Demonstrator_15m'})
+# Save by Meyer-zu-Westerhause on 2024_03_04-12.56.32; build 2023 2022_09_28-20.11.55 183150
